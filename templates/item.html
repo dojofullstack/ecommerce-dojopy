@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+  <main class="mt-5 pt-4">
+    <div class="container dark-grey-text mt-5">
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        <!--Grid column-->
+        <div class="col-md-6">
+            <div class="zoom">
+                <img src="{{item.image_product.url}}" class="img-fluid" alt="">
+            </div>
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-md-6 mb-4">
+          <!--Content-->
+          <div class="p-4">
+              <div class="">
+                  <a href="">
+                      <span class="badge purple mr-1">{{ item.category }}</span>
+                  </a>
+              </div>
+              <h1>
+                  {{ item.name }}
+              </h1>
+
+              <div class="text-warning" style="font-size:0.7rem">
+                  <span class="fa fa-star">
+                  </span>
+                  <span class="fa fa-star">
+                  </span>
+                  <span class="fa fa-star">
+                  </span>
+                  <span class="fa fa-star">
+                  </span>
+                  <span class="fa fa-star">
+                  </span>
+              </div>
+
+              <h4 class="font-weight-bold blue-text">
+                <strong>
+                {% if item.discount_price %}
+                <p class="text-success">
+                  <del style="font-size: 18px; color: black"><span >${{ item.price | floatformat:2| intcomma }} </span></del>
+                    <br>
+                  <span style="font-size: 35px">${{ item.discount_price |floatformat:2|intcomma }} </span>
+                </p>
+                {% else %}
+                <p class="text-success">
+                    <span style="font-size: 35px">${{ item.price | floatformat:2| intcomma }} </span>
+                </p>
+                {% endif %}
+                </strong>
+              </h4>
+
+            <form action="{% url 'order-add' %}" method="post">
+              {% csrf_token %} 
+                <input type="hidden" name="product_id" value="{{item.id}}">
+                <input type="hidden" name="product_slug" value="{{item.slug}}">
+                <input type="hidden" name="product_slug" value="{{item.slug}}">
+<!-- 
+                {% for atr,atr2 in atribts.items %}
+                <div class="variant-picker" style="margin-left: 10px;">
+                    <div class="btn-group" data-toggle="buttons">
+                        <p>{{atr.upper}}:  </p>
+                            {% for atri in atr2 %}
+                                    <label style="padding: 9px; margin-left:15px;" class="btn btn-outline-primary variant-picker__option ">
+                                        <input value="{{atri}}" class="" id="{{atri}}" name="options-{{atr}}" type="radio">
+                                        {{atri.upper}}
+                                    </label>
+                            {% endfor %}
+                    </div>
+                </div><br>
+                {% endfor %} -->
+
+                    <br>
+                    <div class="col-4" style="margin-left:-10px;">
+                        <label for="numberExample">cantidad:</label>
+                        <input name="stock" value="1" type="number" id="numberExample" class="form-control">
+                    </div>
+                    <br>
+
+                    <div id="smart-button-container">
+                      <div style="text-align: center;">
+                        <div id="paypal-button-container"></div>
+                      </div>
+                    </div>
+                  <script src="https://www.paypal.com/sdk/js?client-id=AZeHtz9ynRf6LBFEZCIwQcl-wGC6rVlfGKTH44LBcZ9BVs-INyQQ3VpFYAFWAdX2m2GjMhZBmTQ4Dw-C&enable-funding=venmo&currency=USD" data-sdk-integration-source="button-factory"></script>
+                  <script>
+                    function initPayPalButton() {
+                      paypal.Buttons({
+                        style: {
+                          shape: 'rect',
+                          color: 'gold',
+                          layout: 'vertical',
+                          label: 'paypal',
+                          
+                        },
+                
+                        createOrder: function(data, actions) {
+                          return actions.order.create({
+                            purchase_units: [{"amount":{"currency_code":"USD","value":1}}]
+                          });
+                        },
+                
+                        onApprove: function(data, actions) {
+                          return actions.order.capture().then(function(orderData) {
+                            
+                            // Full available details
+                            console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                
+                            // Show a success message within this page, e.g.
+                            const element = document.getElementById('paypal-button-container');
+                            element.innerHTML = '';
+                            element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                
+                            // Or go to another URL:  actions.redirect('thank_you.html');
+                            
+                          });
+                        },
+                
+                        onError: function(err) {
+                          console.log(err);
+                        }
+                      }).render('#paypal-button-container');
+                    }
+                    initPayPalButton();
+                  </script>
+
+            </form>
+
+
+    <br>
+
+            <p class="lead font-weight-bold">Descripción</p>
+
+            <p>{{ item.detail_text }}</p>
+
+            <!-- <a href="{{ item.get_remove_from_cart_url }}" class="btn btn-danger btn-md my-0 p">
+              Remove from cart
+            </a> -->
+
+          </div>
+          <!--Content-->
+
+        </div>
+        <!--Grid column-->
+
+      </div>
+      <!--Grid row-->
+
+      <hr>
+
+      <!--Grid row-->
+      <div class="row d-flex justify-content-center wow fadeIn">
+        <!--Grid column-->
+        <div class="col-md-6 text-center">
+          <h4 class="my-4 h4">Productos Recomendados</h4>
+        </div>
+        <!--Grid column-->
+      </div>
+      <!--Grid row-->
+      <section class="text-center mb-4">
+        <div class="row wow fadeIn">
+
+          {% for item in object_list %}
+
+              <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card mb-3 zoom">
+
+                    <a href="{% url 'item_detail' item.slug %}">
+                        <div class="view overlay">
+                            <img height="250px" src="{{ item.image_product.url }}" class="card-img-top">
+                        </div>
+
+                        <div class="card-body text-center">
+                          <h5>
+                            <strong>
+                                {{ item.name.upper }}
+                            </strong>
+                          </h5>
+                    </a>
+
+                    <div class="text-warning" style="font-size:0.7rem">
+                        <span class="fa fa-star">
+                        </span>
+                        <span class="fa fa-star">
+                        </span>
+                        <span class="fa fa-star">
+                        </span>
+                        <span class="fa fa-star">
+                        </span>
+                        <span class="fa fa-star">
+                        </span>
+                    </div>
+
+                    <h4 class="font-weight-bold blue-text">
+                      <strong>
+                      {% if item.discount_price %}
+                      <p class="text-success">
+                        <del style="font-size: 18px; color: black"><span >${{ item.price | floatformat:2| intcomma }} </span></del>
+                          <br>
+                        <span>${{ item.discount_price |floatformat:2|intcomma }} </span>
+                      </p>
+                      {% else %}
+                      <p class="text-success">
+                          <span>${{ item.price | floatformat:2| intcomma }} </span>
+                      </p>
+                      {% endif %}
+                      </strong>
+                    </h4>
+
+                  </div>
+
+                </div>
+
+            </div>
+                {% endfor %}
+
+
+      </section>
+
+
+    </div>
+  </main>
+
+{% endblock %}
